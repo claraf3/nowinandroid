@@ -21,63 +21,76 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import javax.inject.Inject
-import kotlin.collections.remove
+import kotlin.collections.mutableListOf
 
-class NiaBackStack @Inject constructor(
-    startKey: NiaBackStackKey,
+class NiaBackStack(
+    private val startKey: NiaNavKey,
 ) {
-    val backStack = mutableStateListOf(startKey)
+    var backStackMap: LinkedHashMap<NiaNavKey, MutableList<NiaNavKey>> =
+        linkedMapOf(
+            startKey to mutableListOf(startKey)
+        )
 
-    // Maintain a stack for each top level route
-    private var topLevelStacks : LinkedHashMap<NiaBackStackKey, SnapshotStateList<NiaBackStackKey>> = linkedMapOf(
-        startKey to mutableStateListOf(startKey)
-    )
 
-    // Expose the current top level route for consumers
-    var currentTopLevelKey by mutableStateOf(startKey)
+    val backStack: SnapshotStateList<NiaNavKey> = mutableStateListOf(startKey)
+
+    var currentTopLevelKey: NiaNavKey by mutableStateOf(backStackMap.keys.first())
         private set
 
-    internal val currentKey: NiaBackStackKey
-        get() = topLevelStacks[currentTopLevelKey]!!.last()
+    val currentKey: NiaNavKey
+        get() = backStackMap[currentTopLevelKey]!!.last()
 
-    private fun updateBackStack() =
-        backStack.apply {
-            clear()
-            addAll(topLevelStacks.flatMap { it.value })
-        }
-
-    fun navigateToTopLevelDestination(key: NiaBackStackKey){
-        // If the top level doesn't exist, add it
-        if (topLevelStacks[key] == null){
-            topLevelStacks.put(key, mutableStateListOf(key))
-        } else {
-            // Otherwise just move it to the end of the stacks
-            topLevelStacks.apply {
-                remove(key)?.let {
-                    put(key, it)
+    fun navigate(key: NiaNavKey) {
+        when {
+            // top level singleTop -> clear substack
+            key == currentTopLevelKey -> backStackMap[key] = mutableListOf(key)
+            // top level non-singleTop
+            key.isTopLevel -> {
+                // if navigating back to start destination, pop all other top destinations and
+                // store start destination substack
+                if (key == startKey) {
+                    val tempStack = mapOf(startKey to backStackMap[startKey]!!)
+                    backStackMap.clear()
+                    backStackMap.putAll(tempStack)
+                // else either restore an existing substack or initiate new one
+                } else {
+                    backStackMap[key] = backStackMap.remove(key) ?: mutableListOf(key)
                 }
-            }
-        }
 
-        currentTopLevelKey = key
+            }
+            // not top level - add to current substack
+            else -> backStackMap.values.last().add(key)
+        }
         updateBackStack()
     }
 
-    fun navigate(key: NiaBackStackKey){
-        if (backStack.lastOrNull() != key) {
-            topLevelStacks[currentTopLevelKey]?.add(key)
-            updateBackStack()
+    fun removeLast() {
+        if (currentKey == currentTopLevelKey) {
+            backStackMap.remove(currentTopLevelKey)
+        } else {
+            backStackMap[currentTopLevelKey]!!.removeLastOrNull()
         }
+        updateBackStack()
     }
 
-    fun removeLast(){
-        val removedKey = topLevelStacks[currentTopLevelKey]?.removeLastOrNull()
-        // If the removed key was a top level key, remove the associated top level stack
-        topLevelStacks.remove(removedKey)
-        currentTopLevelKey = topLevelStacks.keys.last()
+    fun updateBackStack() {
+        backStack.apply {
+            clear()
+            backStackMap.forEach {
+                backStack.addAll(it.value)
+            }
+        }
+        currentTopLevelKey = backStackMap.keys.last()
+    }
+
+    fun restore(map: LinkedHashMap<NiaNavKey, MutableList<NiaNavKey>>?) {
+        map ?: return
+        backStackMap.clear()
+        backStackMap.putAll(map)
         updateBackStack()
     }
 }
 
-interface NiaBackStackKey
+interface NiaNavKey {
+    val isTopLevel: Boolean
+}
