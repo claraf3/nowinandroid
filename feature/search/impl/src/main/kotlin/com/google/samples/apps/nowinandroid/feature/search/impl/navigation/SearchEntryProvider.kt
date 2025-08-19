@@ -17,8 +17,7 @@
 package com.google.samples.apps.nowinandroid.feature.search.impl.navigation
 
 import androidx.navigation3.runtime.EntryProviderBuilder
-import androidx.navigation3.runtime.entry
-import com.google.samples.apps.nowinandroid.core.navigation.NiaBackStack
+import com.google.samples.apps.nowinandroid.core.navigation.NiaNavigator
 import com.google.samples.apps.nowinandroid.core.navigation.NiaNavKey
 import com.google.samples.apps.nowinandroid.feature.interests.api.navigation.InterestsRoute
 import com.google.samples.apps.nowinandroid.feature.search.api.navigation.SearchRoute
@@ -37,7 +36,7 @@ object SearchEntryProvider {
     @Provides
     @IntoSet
     fun provideSearchEntryProviderBuilder(
-        backStack: NiaBackStack,
+        backStack: NiaNavigator,
     ): EntryProviderBuilder<NiaNavKey>.() -> Unit = {
         entry<SearchRoute> { key ->
             SearchScreen(

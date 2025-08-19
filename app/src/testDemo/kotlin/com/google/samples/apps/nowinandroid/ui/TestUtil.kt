@@ -17,8 +17,7 @@
 package com.google.samples.apps.nowinandroid.ui
 
 import androidx.navigation3.runtime.EntryProviderBuilder
-import androidx.navigation3.runtime.entry
-import com.google.samples.apps.nowinandroid.core.navigation.NiaBackStack
+import com.google.samples.apps.nowinandroid.core.navigation.NiaNavigator
 import com.google.samples.apps.nowinandroid.core.navigation.NiaNavKey
 import com.google.samples.apps.nowinandroid.feature.foryou.api.navigation.ForYouRoute
 import com.google.samples.apps.nowinandroid.feature.foryou.impl.ForYouScreen
@@ -34,4 +33,4 @@ val MockEntryProvider: Set<EntryProviderBuilder<NiaNavKey>.() -> Unit> =
 
 private val startKey = ForYouRoute
 
-fun mockNiaBackStack() = NiaBackStack(startKey)
+fun mockNiaBackStack() = NiaNavigator(startKey)

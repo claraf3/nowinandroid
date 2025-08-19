@@ -16,7 +16,7 @@
 
 package com.google.samples.apps.nowinandroid.di
 
-import com.google.samples.apps.nowinandroid.core.navigation.NiaBackStack
+import com.google.samples.apps.nowinandroid.core.navigation.NiaNavigator
 import com.google.samples.apps.nowinandroid.core.navigation.NiaNavKey
 import com.google.samples.apps.nowinandroid.navigation.TopLevelDestination
 import dagger.Module
@@ -33,8 +33,8 @@ import javax.inject.Singleton
 object BackStackProvider {
     @Provides
     @Singleton
-    fun provideNiaBackStack(): NiaBackStack =
-        NiaBackStack(startKey = TopLevelDestination.FOR_YOU.key)
+    fun provideNiaBackStack(): NiaNavigator =
+        NiaNavigator(startKey = TopLevelDestination.FOR_YOU.key)
 
     /**
      * Registers feature modules' polymorphic serializers to support

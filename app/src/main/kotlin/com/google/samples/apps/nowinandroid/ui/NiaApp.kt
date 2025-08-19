@@ -156,7 +156,7 @@ internal fun NiaApp(
                 val selected = destination.key == currentTopLevelKey
                 item(
                     selected = selected,
-                    onClick = { appState.niaBackStack.navigate(destination.key) },
+                    onClick = { appState.niaNavigator.navigate(destination.key) },
                     icon = {
                         Icon(
                             imageVector = destination.unselectedIcon,
@@ -227,7 +227,7 @@ internal fun NiaApp(
                             containerColor = Color.Transparent,
                         ),
                         onActionClick = { onTopAppBarActionClick() },
-                        onNavigationClick = { appState.niaBackStack.navigateToSearch() },
+                        onNavigationClick = { appState.niaNavigator.navigateToSearch() },
                     )
                 }
 
@@ -242,7 +242,7 @@ internal fun NiaApp(
                     ),
                 ) {
                     NiaNavDisplay(
-                        niaBackStack = appState.niaBackStack,
+                        niaNavigator = appState.niaNavigator,
                         entryProviderBuilders,
                     )
                 }

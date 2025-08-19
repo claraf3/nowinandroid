@@ -24,26 +24,24 @@ import androidx.navigation3.runtime.EntryProviderBuilder
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import androidx.navigation3.ui.rememberSceneSetupNavEntryDecorator
-import com.google.samples.apps.nowinandroid.core.navigation.NiaBackStack
+import com.google.samples.apps.nowinandroid.core.navigation.NiaNavigator
 import com.google.samples.apps.nowinandroid.core.navigation.NiaNavKey
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun NiaNavDisplay(
-    niaBackStack: NiaBackStack,
+    niaNavigator: NiaNavigator,
     entryProviderBuilders: Set<EntryProviderBuilder<NiaNavKey>.() -> Unit>,
 ) {
     val listDetailStrategy = rememberListDetailSceneStrategy<NiaNavKey>()
 
     NavDisplay(
-        backStack = niaBackStack.backStack,
+        backStack = niaNavigator.backStack,
         sceneStrategy = listDetailStrategy,
-        onBack = { count -> niaBackStack.popLast(count) },
+        onBack = { count -> niaNavigator.popLast(count) },
         entryDecorators = listOf(
-            rememberSceneSetupNavEntryDecorator(),
             rememberSavedStateNavEntryDecorator(),
-            rememberViewModelStoreNavEntryDecorator(),
+            rememberViewModelStoreNavEntryDecorator()
         ),
         entryProvider = entryProvider {
             entryProviderBuilders.forEach { builder ->

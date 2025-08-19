@@ -36,7 +36,7 @@ import androidx.test.espresso.Espresso
 import com.google.samples.apps.nowinandroid.core.data.repository.TopicsRepository
 import com.google.samples.apps.nowinandroid.core.designsystem.theme.NiaTheme
 import com.google.samples.apps.nowinandroid.core.model.data.Topic
-import com.google.samples.apps.nowinandroid.core.navigation.NiaBackStack
+import com.google.samples.apps.nowinandroid.core.navigation.NiaNavigator
 import com.google.samples.apps.nowinandroid.core.navigation.NiaBackStackViewModel
 import com.google.samples.apps.nowinandroid.core.navigation.NiaNavKey
 import com.google.samples.apps.nowinandroid.feature.interests.api.R
@@ -162,7 +162,7 @@ class InterestsListDetailScreenTest {
         composeTestRule.apply {
             setContent {
                 val backStackViewModel by composeTestRule.activity.viewModels<NiaBackStackViewModel>()
-                val backStack = backStackViewModel.niaBackStack.backStack
+                val backStack = backStackViewModel.niaNavigator.backStack
                 NiaTheme {
                     NavDisplay(
                         backStack = backStack,
@@ -189,7 +189,7 @@ class InterestsListDetailScreenTest {
         composeTestRule.apply {
             setContent {
                 val backStackViewModel by composeTestRule.activity.viewModels<NiaBackStackViewModel>()
-                val backStack = backStackViewModel.niaBackStack.backStack
+                val backStack = backStackViewModel.niaNavigator.backStack
                 NiaTheme {
                     NavDisplay(
                         backStack = backStack,
@@ -216,7 +216,7 @@ class InterestsListDetailScreenTest {
         composeTestRule.apply {
             setContent {
                 val backStackViewModel by composeTestRule.activity.viewModels<NiaBackStackViewModel>()
-                val backStack = backStackViewModel.niaBackStack.backStack
+                val backStack = backStackViewModel.niaNavigator.backStack
                 NiaTheme {
                     NavDisplay(
                         backStack = backStack,
@@ -251,8 +251,8 @@ private fun AndroidComposeTestRule<*, *>.stringResource(
 object BackStackProvider {
     @Provides
     @Singleton
-    fun provideNiaBackStack(): NiaBackStack =
-        NiaBackStack(startKey = InterestsRoute())
+    fun provideNiaBackStack(): NiaNavigator =
+        NiaNavigator(startKey = InterestsRoute())
 
     @Provides
     @Singleton

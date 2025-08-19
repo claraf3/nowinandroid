@@ -34,7 +34,7 @@ import javax.inject.Inject
 @HiltViewModel
 class NiaBackStackViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    val niaBackStack: NiaBackStack,
+    val niaNavigator: NiaNavigator,
     serializersModules: SerializersModule,
 ) : ViewModel() {
 
@@ -52,7 +52,7 @@ class NiaBackStackViewModel @Inject constructor(
         if (backStackMap.isNotEmpty()) {
             // Restore backstack from saved state handle if not emtpy
             @Suppress("UNCHECKED_CAST")
-            niaBackStack.restore(
+            niaNavigator.restore(
                 backStackMap as LinkedHashMap<NiaNavKey, MutableList<NiaNavKey>>,
             )
         }
@@ -60,8 +60,8 @@ class NiaBackStackViewModel @Inject constructor(
         // Start observing changes to the backStack and save backStack whenever it updates
         viewModelScope.launch {
             snapshotFlow {
-                niaBackStack.backStack.toList()
-                backStackMap = niaBackStack.backStackMap
+                niaNavigator.backStack.toList()
+                backStackMap = niaNavigator.backStackMap
             }.collect()
         }
     }

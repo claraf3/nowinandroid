@@ -47,7 +47,7 @@ class NiaBackStackViewModelTest {
 
     private fun createViewModel() = NiaBackStackViewModel(
         savedStateHandle = SavedStateHandle(),
-        niaBackStack = NiaBackStack(TestStartKey),
+        niaNavigator = NiaNavigator(TestStartKey),
         serializersModules = serializersModules,
     )
 
@@ -66,7 +66,7 @@ class NiaBackStackViewModelTest {
     fun testNonTopLevelKeySaved() {
         val viewModel = createViewModel()
         rule.setContent {
-            val backStack = viewModel.niaBackStack
+            val backStack = viewModel.niaNavigator
 
             backStack.navigate(TestKeyFirst)
         }
@@ -81,7 +81,7 @@ class NiaBackStackViewModelTest {
     fun testTopLevelKeySaved() {
         val viewModel = createViewModel()
         rule.setContent {
-            val backStack = viewModel.niaBackStack
+            val backStack = viewModel.niaNavigator
 
             backStack.navigate(TestKeyFirst)
             backStack.navigate(TestTopLevelKeyFirst)
@@ -99,9 +99,9 @@ class NiaBackStackViewModelTest {
     fun testMultiStacksSaved() {
         val viewModel = createViewModel()
         rule.setContent {
-            viewModel.niaBackStack.navigate(TestKeyFirst)
-            viewModel.niaBackStack.navigate(TestTopLevelKeyFirst)
-            viewModel.niaBackStack.navigate(TestKeySecond)
+            viewModel.niaNavigator.navigate(TestKeyFirst)
+            viewModel.niaNavigator.navigate(TestTopLevelKeyFirst)
+            viewModel.niaNavigator.navigate(TestKeySecond)
         }
 
         assertThat(viewModel.backStackMap).containsExactly(
@@ -116,7 +116,7 @@ class NiaBackStackViewModelTest {
     fun testPopSaved() {
         val viewModel = createViewModel()
         rule.setContent {
-            val backStack = viewModel.niaBackStack
+            val backStack = viewModel.niaNavigator
 
             backStack.navigate(TestKeyFirst)
             assertThat(viewModel.backStackMap).containsExactly(
@@ -139,15 +139,15 @@ class NiaBackStackViewModelTest {
             scenario = viewModelScenario {
                 NiaBackStackViewModel(
                     savedStateHandle = createSavedStateHandle(),
-                    niaBackStack = NiaBackStack(TestStartKey),
+                    niaNavigator = NiaNavigator(TestStartKey),
                     serializersModules = serializersModules,
                 )
             }
         }
 
         rule.runOnIdle {
-            scenario.viewModel.niaBackStack.navigate(TestKeyFirst)
-            assertThat(scenario.viewModel.niaBackStack.backStack).containsExactly(
+            scenario.viewModel.niaNavigator.navigate(TestKeyFirst)
+            assertThat(scenario.viewModel.niaNavigator.backStack).containsExactly(
                 TestStartKey,
                 TestKeyFirst,
             ).inOrder()
@@ -156,7 +156,7 @@ class NiaBackStackViewModelTest {
         scenario.recreate()
 
         rule.runOnIdle {
-            assertThat(scenario.viewModel.niaBackStack.backStack).containsExactly(
+            assertThat(scenario.viewModel.niaNavigator.backStack).containsExactly(
                 TestStartKey,
                 TestKeyFirst,
             ).inOrder()
@@ -170,18 +170,18 @@ class NiaBackStackViewModelTest {
             scenario = viewModelScenario {
                 NiaBackStackViewModel(
                     savedStateHandle = createSavedStateHandle(),
-                    niaBackStack = NiaBackStack(TestStartKey),
+                    niaNavigator = NiaNavigator(TestStartKey),
                     serializersModules = serializersModules,
                 )
             }
         }
 
         rule.runOnIdle {
-            scenario.viewModel.niaBackStack.navigate(TestKeyFirst)
-            scenario.viewModel.niaBackStack.navigate(TestTopLevelKeyFirst)
-            scenario.viewModel.niaBackStack.navigate(TestKeySecond)
+            scenario.viewModel.niaNavigator.navigate(TestKeyFirst)
+            scenario.viewModel.niaNavigator.navigate(TestTopLevelKeyFirst)
+            scenario.viewModel.niaNavigator.navigate(TestKeySecond)
 
-            assertThat(scenario.viewModel.niaBackStack.backStack).containsExactly(
+            assertThat(scenario.viewModel.niaNavigator.backStack).containsExactly(
                 TestStartKey,
                 TestKeyFirst,
                 TestTopLevelKeyFirst,
@@ -192,7 +192,7 @@ class NiaBackStackViewModelTest {
         scenario.recreate()
 
         rule.runOnIdle {
-            assertThat(scenario.viewModel.niaBackStack.backStack).containsExactly(
+            assertThat(scenario.viewModel.niaNavigator.backStack).containsExactly(
                 TestStartKey,
                 TestKeyFirst,
                 TestTopLevelKeyFirst,

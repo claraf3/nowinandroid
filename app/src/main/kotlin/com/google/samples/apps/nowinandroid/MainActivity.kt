@@ -144,7 +144,7 @@ class MainActivity : ComponentActivity() {
                 networkMonitor = networkMonitor,
                 userNewsResourceRepository = userNewsResourceRepository,
                 timeZoneMonitor = timeZoneMonitor,
-                niaBackStack = backStackViewModel.niaBackStack,
+                niaNavigator = backStackViewModel.niaNavigator,
             )
 
             val currentTimeZone by appState.currentTimeZone.collectAsStateWithLifecycle()

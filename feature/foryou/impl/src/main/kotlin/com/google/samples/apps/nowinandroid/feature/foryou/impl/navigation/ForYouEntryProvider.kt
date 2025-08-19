@@ -17,8 +17,7 @@
 package com.google.samples.apps.nowinandroid.feature.foryou.impl.navigation
 
 import androidx.navigation3.runtime.EntryProviderBuilder
-import androidx.navigation3.runtime.entry
-import com.google.samples.apps.nowinandroid.core.navigation.NiaBackStack
+import com.google.samples.apps.nowinandroid.core.navigation.NiaNavigator
 import com.google.samples.apps.nowinandroid.core.navigation.NiaNavKey
 import com.google.samples.apps.nowinandroid.feature.foryou.api.navigation.ForYouRoute
 import com.google.samples.apps.nowinandroid.feature.foryou.impl.ForYouScreen
@@ -39,7 +38,7 @@ object ForYouEntryProvider {
     @Provides
     @IntoSet
     fun provideForYouEntryProviderBuilder(
-        backStack: NiaBackStack,
+        backStack: NiaNavigator,
     ): EntryProviderBuilder<NiaNavKey>.() -> Unit = {
         entry<ForYouRoute> {
             ForYouScreen(

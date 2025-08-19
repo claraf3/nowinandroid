@@ -26,7 +26,7 @@ import kotlin.collections.mutableListOf
 
 // TODO refine back behavior - perhaps take a lambda so that each screen / use site can customize back behavior?
 // https://github.com/android/nowinandroid/issues/1934
-class NiaBackStack(
+class NiaNavigator(
     private val startKey: NiaNavKey,
 ) {
     internal var backStackMap: LinkedHashMap<NiaNavKey, MutableList<NiaNavKey>> =
