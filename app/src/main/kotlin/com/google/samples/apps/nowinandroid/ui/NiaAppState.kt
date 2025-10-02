@@ -20,12 +20,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.snapshotFlow
 import com.google.samples.apps.nowinandroid.core.data.repository.UserNewsResourceRepository
 import com.google.samples.apps.nowinandroid.core.data.util.NetworkMonitor
 import com.google.samples.apps.nowinandroid.core.data.util.TimeZoneMonitor
 import com.google.samples.apps.nowinandroid.core.navigation.NiaNavigator
-import com.google.samples.apps.nowinandroid.core.ui.TrackDisposableJank
 import com.google.samples.apps.nowinandroid.navigation.TopLevelDestination
 import com.google.samples.apps.nowinandroid.navigation.TopLevelDestination.BOOKMARKS
 import com.google.samples.apps.nowinandroid.navigation.TopLevelDestination.FOR_YOU
@@ -73,7 +71,7 @@ class NiaAppState(
     timeZoneMonitor: TimeZoneMonitor,
 ) {
     val currentTopLevelDestination: TopLevelDestination?
-        @Composable get() = TopLevelDestinations[niaNavigator.currentTopLevelKey]
+        @Composable get() = TopLevelDestinations[niaNavigator.currentActiveTopLevelKey]
 
     val isOffline = networkMonitor.isOnline
         .map(Boolean::not)
@@ -119,11 +117,11 @@ class NiaAppState(
  */
 @Composable
 private fun NavigationTrackingSideEffect(niaNavigator: NiaNavigator) {
-    TrackDisposableJank(niaNavigator) { metricsHolder ->
-        snapshotFlow {
-            val stack = niaNavigator.backStack.toList()
-            metricsHolder.state?.putState("Navigation", stack.lastOrNull().toString())
-        }
-        onDispose { }
-    }
+//    TrackDisposableJank(niaNavigator) { metricsHolder ->
+//        snapshotFlow {
+//            val stack = niaNavigator.backStack.toList()
+//            metricsHolder.state?.putState("Navigation", stack.lastOrNull().toString())
+//        }
+//        onDispose { }
+//    }
 }

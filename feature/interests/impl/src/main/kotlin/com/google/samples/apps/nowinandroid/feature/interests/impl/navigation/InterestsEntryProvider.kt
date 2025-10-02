@@ -19,7 +19,7 @@ package com.google.samples.apps.nowinandroid.feature.interests.impl.navigation
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import com.google.samples.apps.nowinandroid.core.navigation.NiaNavigator
 import com.google.samples.apps.nowinandroid.core.navigation.NiaNavKey
 import com.google.samples.apps.nowinandroid.feature.interests.api.navigation.InterestsRoute
@@ -31,10 +31,11 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.multibindings.IntoSet
 
 @Module
-@InstallIn(ActivityComponent::class)
+@InstallIn(ActivityRetainedComponent::class)
 object InterestsEntryProvider {
 
     @OptIn(ExperimentalMaterial3AdaptiveApi::class)
@@ -42,7 +43,7 @@ object InterestsEntryProvider {
     @IntoSet
     fun provideInterestsEntryProviderBuilder(
         backStack: NiaNavigator,
-    ): EntryProviderBuilder<NiaNavKey>.() -> Unit = {
+    ): EntryProviderScope<NiaNavKey>.() -> Unit = {
         entry<InterestsRoute>(
             metadata = ListDetailSceneStrategy.listPane {
                 InterestsDetailPlaceholder()

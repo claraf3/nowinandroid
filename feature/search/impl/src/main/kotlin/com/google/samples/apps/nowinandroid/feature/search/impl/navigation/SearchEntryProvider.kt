@@ -16,7 +16,7 @@
 
 package com.google.samples.apps.nowinandroid.feature.search.impl.navigation
 
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import com.google.samples.apps.nowinandroid.core.navigation.NiaNavigator
 import com.google.samples.apps.nowinandroid.core.navigation.NiaNavKey
 import com.google.samples.apps.nowinandroid.feature.interests.api.navigation.InterestsRoute
@@ -27,20 +27,21 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.multibindings.IntoSet
 
 @Module
-@InstallIn(ActivityComponent::class)
+@InstallIn(ActivityRetainedComponent::class)
 object SearchEntryProvider {
 
     @Provides
     @IntoSet
     fun provideSearchEntryProviderBuilder(
         backStack: NiaNavigator,
-    ): EntryProviderBuilder<NiaNavKey>.() -> Unit = {
+    ): EntryProviderScope<NiaNavKey>.() -> Unit = {
         entry<SearchRoute> { key ->
             SearchScreen(
-                onBackClick = backStack::popLast,
+                onBackClick = backStack::pop,
                 onInterestsClick = { backStack.navigate(InterestsRoute()) },
                 onTopicClick = backStack::navigateToTopic,
             )

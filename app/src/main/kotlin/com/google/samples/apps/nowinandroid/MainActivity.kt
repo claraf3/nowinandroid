@@ -32,7 +32,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.metrics.performance.JankStats
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.tracing.trace
 import com.google.samples.apps.nowinandroid.MainActivityUiState.Loading
 import com.google.samples.apps.nowinandroid.core.analytics.AnalyticsHelper
@@ -54,6 +54,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Provider
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -75,12 +76,12 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var userNewsResourceRepository: UserNewsResourceRepository
+
+    @Inject
+    lateinit var entryProviderBuilders: Set<@JvmSuppressWildcards EntryProviderScope<NiaNavKey>.() -> Unit>
     private val viewModel: MainActivityViewModel by viewModels()
 
     private val backStackViewModel: NiaBackStackViewModel by viewModels()
-
-    @Inject
-    lateinit var entryProviderBuilders: Set<@JvmSuppressWildcards EntryProviderBuilder<NiaNavKey>.() -> Unit>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
@@ -160,7 +161,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     NiaApp(
                         appState,
-                        entryProviderBuilders,
+                        entryProviderBuilders = entryProviderBuilders
                     )
                 }
             }

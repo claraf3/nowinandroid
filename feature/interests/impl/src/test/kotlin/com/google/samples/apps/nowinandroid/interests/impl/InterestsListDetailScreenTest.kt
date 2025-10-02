@@ -30,6 +30,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import androidx.test.espresso.Espresso
@@ -49,6 +50,7 @@ import dagger.hilt.EntryPoint
 import dagger.hilt.EntryPoints
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
@@ -85,9 +87,9 @@ class InterestsListDetailScreenTest {
 
     // entry point to get the features' hilt-injected EntryProviders that are installed in ActivityComponent
     @EntryPoint
-    @InstallIn(ActivityComponent::class)
+    @InstallIn(ActivityRetainedComponent::class)
     interface EntryProvidersEntryPoint {
-        fun getEntryProviders(): Set<@JvmSuppressWildcards EntryProviderBuilder<NiaNavKey>.() -> Unit>
+        fun getEntryProviders(): Set<@JvmSuppressWildcards EntryProviderScope<NiaNavKey>.() -> Unit>
     }
 
     @Inject
@@ -104,7 +106,7 @@ class InterestsListDetailScreenTest {
     private val Topic.testTag
         get() = "topic:${this.id}"
 
-    private lateinit var entryProviderBuilders: Set<EntryProviderBuilder<NiaNavKey>.() -> Unit>
+    private lateinit var entryProviderBuilders: Set<EntryProviderScope<NiaNavKey>.() -> Unit>
 
     @Before
     fun setup() {

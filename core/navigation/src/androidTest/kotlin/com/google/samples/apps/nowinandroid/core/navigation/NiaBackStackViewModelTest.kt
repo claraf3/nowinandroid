@@ -124,7 +124,7 @@ class NiaBackStackViewModelTest {
                 mutableListOf(TestStartKey, TestKeyFirst),
             )
 
-            backStack.popLast()
+            backStack.pop()
             assertThat(viewModel.backStackMap).containsExactly(
                 TestStartKey,
                 mutableListOf(TestStartKey),

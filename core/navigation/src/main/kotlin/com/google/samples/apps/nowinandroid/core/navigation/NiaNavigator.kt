@@ -16,112 +16,110 @@
 
 package com.google.samples.apps.nowinandroid.core.navigation
 
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavEntry
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberDecoratedNavEntries
+import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import org.jetbrains.annotations.VisibleForTesting
-import kotlin.collections.mutableListOf
+import javax.inject.Provider
 
 // TODO refine back behavior - perhaps take a lambda so that each screen / use site can customize back behavior?
 // https://github.com/android/nowinandroid/issues/1934
 class NiaNavigator(
     private val startKey: NiaNavKey,
+    private val entryProviderBuilders: Provider<Set<EntryProviderScope<NiaNavKey>.() -> Unit>>,
 ) {
-    internal var backStackMap: LinkedHashMap<NiaNavKey, MutableList<NiaNavKey>> =
+    var backStackStore: MutableMap<NiaNavKey, SnapshotStateList<NiaNavKey>> =
         linkedMapOf(
-            startKey to mutableListOf(startKey),
+            startKey to mutableStateListOf(startKey),
         )
 
-    @VisibleForTesting
-    val backStack: SnapshotStateList<NiaNavKey> = mutableStateListOf(startKey)
+    val activeTopLeveLKeys: SnapshotStateList<NiaNavKey> = mutableStateListOf(startKey)
 
-    var currentTopLevelKey: NiaNavKey by mutableStateOf(backStackMap.keys.last())
+    var currentActiveTopLevelKey: NiaNavKey by mutableStateOf(activeTopLeveLKeys.last())
         private set
 
     @get:VisibleForTesting
     val currentKey: NiaNavKey
-        get() = backStackMap[currentTopLevelKey]!!.last()
+        get() = backStackStore[currentActiveTopLevelKey]!!.last()
 
     fun navigate(key: NiaNavKey) {
+        val currentActiveSubStacks = linkedSetOf<NiaNavKey>()
+        currentActiveSubStacks.addAll(activeTopLeveLKeys)
         when {
             // top level singleTop -> clear substack
-            key == currentTopLevelKey -> backStackMap[key] = mutableListOf(key)
+            key == currentActiveTopLevelKey -> {
+                backStackStore[key] = mutableStateListOf(key)
+                // no change to currentActiveTabs
+            }
             // top level non-singleTop
             key.isTopLevel -> {
-                // if navigating back to start destination, pop all other top destinations and
-                // store start destination substack
+                // if navigating back to start destination, then only show the starting substack
                 if (key == startKey) {
-                    val tempStack = mapOf(startKey to backStackMap[startKey]!!)
-                    backStackMap.clear()
-                    backStackMap.putAll(tempStack)
-                    // else either restore an existing substack or initiate new one
+                    currentActiveSubStacks.clear()
+                    currentActiveSubStacks.add(key)
                 } else {
-                    backStackMap[key] = backStackMap.remove(key) ?: mutableListOf(key)
+                    // else either restore an existing substack or initiate new one
+                    backStackStore[key] = backStackStore.remove(key) ?: mutableStateListOf(key)
+                    // move this top level key to the top of active substacks
+                    currentActiveSubStacks.remove(key)
+                    currentActiveSubStacks.add(key)
                 }
             }
             // not top level - add to current substack
             else -> {
-                val currentStack = backStackMap.values.last()
+                val currentStack = backStackStore[currentActiveTopLevelKey]!!
                 // single top
                 if (currentStack.lastOrNull() == key) {
                     currentStack.removeLastOrNull()
                 }
                 currentStack.add(key)
+                println("cfok ${currentActiveTopLevelKey::class.simpleName} stack:[${currentStack.map { it::class.simpleName }}]")
+                // no change to currentActiveTabs
             }
         }
-        updateBackStack()
+        updateActiveTopLevelKeys(currentActiveSubStacks.toList())
     }
 
-    fun popLast(count: Int = 1) {
-        var popCount = count
-        var currentEntry = backStackMap.entries.last()
-        while (popCount > 0) {
-            val currentStack = currentEntry.value
-            if (currentStack.size == 1) {
-                // if current sub-stack only has one key, remove the sub-stack from the map
-                backStackMap.remove(currentEntry.key)
-                when {
-                    // throw if map is empty after pop
-                    backStackMap.isEmpty() -> error(popErrorMessage(count, currentEntry.key))
-                    // otherwise update currentEntry
-                    else -> currentEntry = backStackMap.entries.last()
-                }
-            } else {
-                // if current sub-stack has more than one key, just pop the last key off the sub-stack
-                currentStack.removeLastOrNull()
-            }
-            popCount--
+    fun pop() {
+        val currentSubstack = backStackStore[currentActiveTopLevelKey]!!
+        if (currentSubstack.size == 1) {
+            // if current sub-stack only has one key, remove the sub-stack from the map
+            currentSubstack.removeLastOrNull()
+            backStackStore.remove(currentActiveTopLevelKey)
+            updateActiveTopLevelKeys(activeTopLeveLKeys.dropLast(1))
+        } else {
+            currentSubstack.removeLastOrNull()
         }
-        updateBackStack()
     }
 
-    private fun updateBackStack() {
-        backStack.apply {
-            clear()
-            backStack.addAll(
-                backStackMap.flatMap { it.value },
-            )
-        }
-
-        currentTopLevelKey = backStackMap.keys.last()
+    private fun updateActiveTopLevelKeys(activeKeys: List<NiaNavKey>) {
+        require(activeKeys.isNotEmpty()) { "List of active top-level keys should not be empty" }
+        activeTopLeveLKeys.clear()
+        activeTopLeveLKeys.addAll(activeKeys)
+        currentActiveTopLevelKey = activeTopLeveLKeys.last()
     }
 
-    internal fun restore(map: LinkedHashMap<NiaNavKey, MutableList<NiaNavKey>>?) {
+    internal fun restore(activeKeys: List<NiaNavKey>, map: LinkedHashMap<NiaNavKey, SnapshotStateList<NiaNavKey>>?) {
         map ?: return
-        backStackMap.clear()
-        backStackMap.putAll(map)
-        updateBackStack()
+        backStackStore.clear()
+        map.forEach { entry ->
+            backStackStore[entry.key] = entry.value.toMutableStateList()
+        }
+        updateActiveTopLevelKeys(activeKeys)
     }
 }
 
 interface NiaNavKey {
     val isTopLevel: Boolean
 }
-
-private fun popErrorMessage(count: Int, lastPopped: NiaNavKey) =
-    """
-        Failed to pop $count entries. BackStack has been popped to an empty stack. Last
-        popped key is $lastPopped.
-    """.trimIndent()

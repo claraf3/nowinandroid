@@ -33,7 +33,7 @@ class NiaBackStackTest {
     @Test
     fun testStartKey() {
         assertThat(niaNavigator.currentKey).isEqualTo(TestStartKey)
-        assertThat(niaNavigator.currentTopLevelKey).isEqualTo(TestStartKey)
+        assertThat(niaNavigator.currentActiveTopLevelKey).isEqualTo(TestStartKey)
     }
 
     @Test
@@ -41,7 +41,7 @@ class NiaBackStackTest {
         niaNavigator.navigate(TestKeyFirst)
 
         assertThat(niaNavigator.currentKey).isEqualTo(TestKeyFirst)
-        assertThat(niaNavigator.currentTopLevelKey).isEqualTo(TestStartKey)
+        assertThat(niaNavigator.currentActiveTopLevelKey).isEqualTo(TestStartKey)
     }
 
     @Test
@@ -49,7 +49,7 @@ class NiaBackStackTest {
         niaNavigator.navigate(TestTopLevelKey)
 
         assertThat(niaNavigator.currentKey).isEqualTo(TestTopLevelKey)
-        assertThat(niaNavigator.currentTopLevelKey).isEqualTo(TestTopLevelKey)
+        assertThat(niaNavigator.currentActiveTopLevelKey).isEqualTo(TestTopLevelKey)
     }
 
     @Test
@@ -93,12 +93,12 @@ class NiaBackStackTest {
         niaNavigator.navigate(TestKeyFirst)
 
         assertThat(niaNavigator.currentKey).isEqualTo(TestKeyFirst)
-        assertThat(niaNavigator.currentTopLevelKey).isEqualTo(TestStartKey)
+        assertThat(niaNavigator.currentActiveTopLevelKey).isEqualTo(TestStartKey)
 
         niaNavigator.navigate(TestKeySecond)
 
         assertThat(niaNavigator.currentKey).isEqualTo(TestKeySecond)
-        assertThat(niaNavigator.currentTopLevelKey).isEqualTo(TestStartKey)
+        assertThat(niaNavigator.currentActiveTopLevelKey).isEqualTo(TestStartKey)
     }
 
     @Test
@@ -107,25 +107,25 @@ class NiaBackStackTest {
         niaNavigator.navigate(TestKeyFirst)
 
         assertThat(niaNavigator.currentKey).isEqualTo(TestKeyFirst)
-        assertThat(niaNavigator.currentTopLevelKey).isEqualTo(TestStartKey)
+        assertThat(niaNavigator.currentActiveTopLevelKey).isEqualTo(TestStartKey)
 
         // navigate to new top level
         niaNavigator.navigate(TestTopLevelKey)
 
         assertThat(niaNavigator.currentKey).isEqualTo(TestTopLevelKey)
-        assertThat(niaNavigator.currentTopLevelKey).isEqualTo(TestTopLevelKey)
+        assertThat(niaNavigator.currentActiveTopLevelKey).isEqualTo(TestTopLevelKey)
 
         // add to new stack
         niaNavigator.navigate(TestKeySecond)
 
         assertThat(niaNavigator.currentKey).isEqualTo(TestKeySecond)
-        assertThat(niaNavigator.currentTopLevelKey).isEqualTo(TestTopLevelKey)
+        assertThat(niaNavigator.currentActiveTopLevelKey).isEqualTo(TestTopLevelKey)
 
         // go back to start stack
         niaNavigator.navigate(TestStartKey)
 
         assertThat(niaNavigator.currentKey).isEqualTo(TestKeyFirst)
-        assertThat(niaNavigator.currentTopLevelKey).isEqualTo(TestStartKey)
+        assertThat(niaNavigator.currentActiveTopLevelKey).isEqualTo(TestStartKey)
     }
 
     @Test
@@ -147,7 +147,7 @@ class NiaBackStackTest {
         ).inOrder()
 
         assertThat(niaNavigator.currentKey).isEqualTo(TestKeySecond)
-        assertThat(niaNavigator.currentTopLevelKey).isEqualTo(TestTopLevelKey)
+        assertThat(niaNavigator.currentActiveTopLevelKey).isEqualTo(TestTopLevelKey)
     }
 
     @Test
@@ -161,7 +161,7 @@ class NiaBackStackTest {
             TestKeySecond,
         ).inOrder()
 
-        niaNavigator.popLast()
+        niaNavigator.pop()
 
         assertThat(niaNavigator.backStack).containsExactly(
             TestStartKey,
@@ -169,7 +169,7 @@ class NiaBackStackTest {
         ).inOrder()
 
         assertThat(niaNavigator.currentKey).isEqualTo(TestKeyFirst)
-        assertThat(niaNavigator.currentTopLevelKey).isEqualTo(TestStartKey)
+        assertThat(niaNavigator.currentActiveTopLevelKey).isEqualTo(TestStartKey)
     }
 
     @Test
@@ -184,10 +184,10 @@ class NiaBackStackTest {
         ).inOrder()
 
         assertThat(niaNavigator.currentKey).isEqualTo(TestTopLevelKey)
-        assertThat(niaNavigator.currentTopLevelKey).isEqualTo(TestTopLevelKey)
+        assertThat(niaNavigator.currentActiveTopLevelKey).isEqualTo(TestTopLevelKey)
 
         // remove TopLevel
-        niaNavigator.popLast()
+        niaNavigator.pop()
 
         assertThat(niaNavigator.backStack).containsExactly(
             TestStartKey,
@@ -195,7 +195,7 @@ class NiaBackStackTest {
         ).inOrder()
 
         assertThat(niaNavigator.currentKey).isEqualTo(TestKeyFirst)
-        assertThat(niaNavigator.currentTopLevelKey).isEqualTo(TestStartKey)
+        assertThat(niaNavigator.currentActiveTopLevelKey).isEqualTo(TestStartKey)
     }
 
     @Test
@@ -209,14 +209,14 @@ class NiaBackStackTest {
             TestKeySecond,
         ).inOrder()
 
-        niaNavigator.popLast(2)
+        niaNavigator.pop(2)
 
         assertThat(niaNavigator.backStack).containsExactly(
             TestStartKey,
         ).inOrder()
 
         assertThat(niaNavigator.currentKey).isEqualTo(TestStartKey)
-        assertThat(niaNavigator.currentTopLevelKey).isEqualTo(TestStartKey)
+        assertThat(niaNavigator.currentActiveTopLevelKey).isEqualTo(TestStartKey)
     }
 
     @Test
@@ -241,20 +241,20 @@ class NiaBackStackTest {
             TestKeySecond,
         ).inOrder()
 
-        niaNavigator.popLast(4)
+        niaNavigator.pop(4)
 
         assertThat(niaNavigator.backStack).containsExactly(
             TestStartKey,
         ).inOrder()
 
         assertThat(niaNavigator.currentKey).isEqualTo(TestStartKey)
-        assertThat(niaNavigator.currentTopLevelKey).isEqualTo(TestStartKey)
+        assertThat(niaNavigator.currentActiveTopLevelKey).isEqualTo(TestStartKey)
     }
 
     @Test
     fun throwOnEmptyBackStack() {
         assertFailsWith<IllegalStateException> {
-            niaNavigator.popLast(1)
+            niaNavigator.pop(1)
         }
     }
 }

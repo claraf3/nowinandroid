@@ -59,7 +59,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import com.google.samples.apps.nowinandroid.R
 import com.google.samples.apps.nowinandroid.core.designsystem.component.NiaBackground
 import com.google.samples.apps.nowinandroid.core.designsystem.component.NiaGradientBackground
@@ -79,9 +79,9 @@ import com.google.samples.apps.nowinandroid.feature.settings.api.R as settingsR
 @Composable
 fun NiaApp(
     appState: NiaAppState,
-    entryProviderBuilders: Set<EntryProviderBuilder<NiaNavKey>.() -> Unit>,
     modifier: Modifier = Modifier,
     windowAdaptiveInfo: WindowAdaptiveInfo = currentWindowAdaptiveInfo(),
+    entryProviderBuilders: Set<EntryProviderScope<NiaNavKey>.() -> Unit>,
 ) {
     val shouldShowGradientBackground =
         appState.currentTopLevelDestination == TopLevelDestination.FOR_YOU
@@ -112,11 +112,11 @@ fun NiaApp(
             CompositionLocalProvider(LocalSnackbarHostState provides snackbarHostState) {
                 NiaApp(
                     appState = appState,
-                    entryProviderBuilders = entryProviderBuilders,
                     showSettingsDialog = showSettingsDialog,
                     onSettingsDismissed = { showSettingsDialog = false },
                     onTopAppBarActionClick = { showSettingsDialog = true },
                     windowAdaptiveInfo = windowAdaptiveInfo,
+                    entryProviderBuilders = entryProviderBuilders,
                 )
             }
         }
@@ -130,12 +130,12 @@ fun NiaApp(
 )
 internal fun NiaApp(
     appState: NiaAppState,
-    entryProviderBuilders: Set<EntryProviderBuilder<NiaNavKey>.() -> Unit>,
     showSettingsDialog: Boolean,
     onSettingsDismissed: () -> Unit,
     onTopAppBarActionClick: () -> Unit,
     modifier: Modifier = Modifier,
     windowAdaptiveInfo: WindowAdaptiveInfo = currentWindowAdaptiveInfo(),
+    entryProviderBuilders: Set<EntryProviderScope<NiaNavKey>.() -> Unit>,
 ) {
     val unreadDestinations by appState.topLevelDestinationsWithUnreadResources
         .collectAsStateWithLifecycle()
@@ -243,7 +243,7 @@ internal fun NiaApp(
                 ) {
                     NiaNavDisplay(
                         niaNavigator = appState.niaNavigator,
-                        entryProviderBuilders,
+                        entryProviderBuilders = entryProviderBuilders,
                     )
                 }
 

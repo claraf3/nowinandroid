@@ -77,7 +77,7 @@ class NiaAppStateTest {
             }
         }
 
-        assertEquals(ForYouRoute, state.niaNavigator.currentTopLevelKey)
+        assertEquals(ForYouRoute, state.niaNavigator.currentActiveTopLevelKey)
         assertEquals(ForYouRoute, state.niaNavigator.currentKey)
 
         // Navigate to another destination once
@@ -85,7 +85,7 @@ class NiaAppStateTest {
 
         composeTestRule.waitForIdle()
 
-        assertEquals(BookmarksRoute, state.niaNavigator.currentTopLevelKey)
+        assertEquals(BookmarksRoute, state.niaNavigator.currentActiveTopLevelKey)
         assertEquals(BookmarksRoute, state.niaNavigator.currentKey)
     }
 
